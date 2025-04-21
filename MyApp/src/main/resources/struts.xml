@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.5//EN"
+        "http://struts.apache.org/dtds/struts-2.5.dtd">
+
+<struts>
+    <package name="basicstruct2" extends="json-default">
+        <interceptors>
+            <interceptor name="methodFilter" class="org.example.interceptor.MethodFilterInterceptor"/>
+            <interceptor-stack name="secureStack">
+                <interceptor-ref name="methodFilter"/>
+                <interceptor-ref name="defaultStack"/>
+                <interceptor-ref name="tokenSession">
+                    <param name="excludeMethods">*</param>
+                </interceptor-ref>
+            </interceptor-stack>
+
+            <interceptor name="rememberMe" class="org.example.interceptor.RememberMeInterceptor"/>
+            <interceptor-stack name="secureStack">
+                <interceptor-ref name="rememberMe"/>
+                <interceptor-ref name="defaultStack"/>
+            </interceptor-stack>
+
+            <interceptor name="authInterceptor" class="org.example.interceptor.AuthenticationInterceptor"/>
+            <interceptor-stack name="authStack">
+                <interceptor-ref name="authInterceptor"/>
+                <interceptor-ref name="defaultStack"/>
+            </interceptor-stack>
+        </interceptors>
+
+        <default-interceptor-ref name="secureStack"/>
+
+        <action name="login" class="org.example.action.LoginAction" method="execute">
+            <interceptor-ref name="secureStack"/>
+            <result name="success" type="redirect">user.action</result>
+
+            <result name="error">/WEB-INF/views/login.jsp</result>
+            <result name="input">/WEB-INF/views/login.jsp</result>
+            <result name="invalid.token">/WEB-INF/views/invalidToken.jsp</result>
+        </action>
+        <action name="logout" class="org.example.action.LogoutAction" method="execute">
+            <result name="success">/WEB-INF/views/login.jsp</result>
+        </action>
+
+        <!--   User     -->
+        <action name="user" class="org.example.action.UserAction">
+            <interceptor-ref name="authStack"/>
+            <result>/WEB-INF/views/user.jsp</result>
+        </action>
+        <action name="getAllUser" class="org.example.action.UserAction" method="list">
+            <interceptor-ref name="authStack"/>
+            <result name="success" type="json">/WEB-INF/views/user.jsp</result>
+        </action>
+        <action name="getListUserFilter" class="org.example.action.UserAction" method="getListUserFilter">
+            <interceptor-ref name="authStack"/>
+            <param name="includeProperties">users.*,paginationInfo.*</param>
+            <result name="success" type="json">/WEB-INF/views/user.jsp</result>
+        </action>
+        <action name="managePermission" class="org.example.action.UserManagePermission" method="managePermission">
+            <interceptor-ref name="authStack"/>
+            <result name="success" type="json">/WEB-INF/views/user.jsp</result>
+        </action>
+        <action name="checkEmailExist" class="org.example.action.UserExists" method="checkEmailExist">
+            <result name="success" type="json">/WEB-INF/views/user.jsp</result>
+        </action>
+        <action name="addUser" class="org.example.action.UserInsert" method="addUser">
+            <interceptor-ref name="authStack"/>
+            <result name="success" type="json">/WEB-INF/views/user.jsp</result>
+        </action>
+        <action name="deleteUser" class="org.example.action.UserDelete" method="deleteUser">
+            <interceptor-ref name="authStack"/>
+            <result name="success" type="json">/WEB-INF/views/user.jsp</result>
+        </action>
+        <action name="updateUser" class="org.example.action.UserInsert" method="updateUser">
+            <interceptor-ref name="authStack"/>
+            <result name="success" type="json">/WEB-INF/views/user.jsp</result>
+        </action>
+
+        <!--  Customer  -->
+        <action name="customer" class="org.example.action.CustomerAction">
+            <interceptor-ref name="authStack"/>
+            <result>/WEB-INF/views/customer.jsp</result>
+        </action>
+        <action name="getFilteredCustomer" class="org.example.action.CustomerAction" method="getFilteredCustomer">
+            <interceptor-ref name="authStack"/>
+            <param name="includeProperties">customers.*,paginationInfo.*</param>
+            <result name="success" type="json">/WEB-INF/views/customer.jsp</result>
+        </action>
+        <action name="checkCustomerExist" class="org.example.action.CustomerExists" method="checkCustomerExist">
+            <result name="success" type="json">/WEB-INF/views/customer.jsp</result>
+        </action>
+        <action name="addCustomer" class="org.example.action.CustomerInsert" method="addCustomer">
+            <interceptor-ref name="authStack"/>
+            <result name="success" type="json">/WEB-INF/views/customer.jsp</result>
+        </action>
+        <action name="updateCustomer" class="org.example.action.CustomerInsert" method="updateCustomer">
+            <interceptor-ref name="authStack"/>
+            <result name="success" type="json">/WEB-INF/views/customer.jsp</result>
+        </action>
+        <action name="importCustomer" class="org.example.action.ImportCustomer" method="importFile">
+            <interceptor-ref name="authStack"/>
+            <interceptor-ref name="fileUpload">
+                <param name="allowedTypes">application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</param>
+                <param name="maximumSize">10485760</param>
+            </interceptor-ref>
+            <interceptor-ref name="secureStack"/>
+            <result name="success" type="json">/WEB-INF/views/customer.jsp</result>
+        </action>
+        <action name="exportCustomer" class="org.example.action.ExportCustomer">
+            <interceptor-ref name="authStack"/>
+        </action>
+
+        <!--  product  -->
+        <action name="product" class="org.example.action.ProductAction">
+            <interceptor-ref name="authStack"/>
+            <result>/WEB-INF/views/product.jsp</result>
+        </action>
+        <action name="getListProductFilter" class="org.example.action.ProductAction" method="getListProductFilter">
+            <interceptor-ref name="authStack"/>
+            <param name="includeProperties">products.*,paginationInfo.*</param>
+            <result name="success" type="json">/WEB-INF/views/product.jsp</result>
+        </action>
+        <action name="deleteProduct" class="org.example.action.ProductDelete" method="deleteProduct">
+            <interceptor-ref name="authStack"/>
+            <result name="success" type="json">/WEB-INF/views/product.jsp</result>
+        </action>
+        <action name="uploadImage" class="org.example.action.CloudinaryAction" method="upload">
+            <interceptor-ref name="fileUpload">
+                <param name="allowedTypes">image/jpeg,image/png</param>
+                <param name="maximumSize">2097152</param> <!-- 10MB -->
+            </interceptor-ref>
+            <interceptor-ref name="defaultStack"/>
+            <result name="none" type="json"/>
+        </action>
+
+        <!--  product detail  -->
+        <action name="productDetail" class="org.example.action.ProductDetailAction">
+            <interceptor-ref name="authStack"/>
+            <result name="success">/WEB-INF/views/productDetail.jsp</result>
+        </action>
+        <action name="addProduct" class="org.example.action.ProductInsert" method="addProduct">
+            <interceptor-ref name="fileUpload">
+                <param name="allowedTypes">image/png,image/jpeg</param>
+                <param name="maximumSize">2097152</param> <!-- 2MB -->
+            </interceptor-ref>
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="json">/WEB-INF/views/productDetail.jsp</result>
+        </action>
+
+    </package>
+
+
+</struts>

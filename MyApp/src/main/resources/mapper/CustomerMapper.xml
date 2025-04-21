@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.mapper.CustomerMapper">
+    <select id="getFilteredCustomer" parameterType="map" resultType="org.example.model.Customer">
+        SELECT * FROM mst_customer
+        WHERE 1=1
+        <if test="name != null and name != ''">
+            AND customer_name LIKE CONCAT('%', #{name}, '%')
+        </if>
+        <if test="email != null and email != ''">
+            AND email LIKE CONCAT('%', #{email}, '%')
+        </if>
+        <if test="status != null and status != ''">
+            AND is_active = #{status}
+        </if>
+        <if test="address != null and address != ''">
+            AND address LIKE CONCAT('%', #{address}, '%')
+        </if>
+        ORDER BY customer_id DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="countFilteredCustomer" parameterType="map" resultType="int">
+        SELECT COUNT(*) FROM mst_customer
+        WHERE 1=1
+        <if test="name != null and name != ''">
+            AND customer_name LIKE CONCAT('%', #{name}, '%')
+        </if>
+        <if test="email != null and email != ''">
+            AND email LIKE CONCAT('%', #{email}, '%')
+        </if>
+        <if test="status != null and status != ''">
+            AND is_active = #{status}
+        </if>
+        <if test="address != null and address != ''">
+            AND address LIKE CONCAT('%', #{address}, '%')
+        </if>
+        ORDER BY customer_id DESC
+    </select>
+
+    <select id="getCustomerByEmail" resultType="org.example.model.Customer">
+        SELECT * FROM mst_customer
+        WHERE email = #{email} AND customer_id != #{customer_id}
+    </select>
+    <insert id="addCustomer">
+        INSERT INTO mst_customer (customer_name, email, tel_num, address)
+        VALUES (#{name}, #{email}, #{tel_num}, #{address})
+    </insert>
+
+    <insert id="updateCustomer">
+        UPDATE mst_customer
+        SET customer_name = #{name}, email = #{email}, tel_num = #{tel_num}, address = #{address}, updated_at = NOW()
+        WHERE customer_id = #{customer_id}
+    </insert>
+</mapper>

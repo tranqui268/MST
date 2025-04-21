@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.mapper.ProductMapper">
+   <select id="getFilteredProducts" parameterType="map" resultType="org.example.model.Product">
+       SELECT * FROM mst_product
+       WHERE 1=1
+       <if test="name != null and name != ''">
+       AND product_name LIKE CONCAT('%', #{name}, '%')
+   </if>
+       <if test="status != null and status != ''">
+           AND is_sales = #{status}
+       </if>
+       <if test="priceFrom != null">
+           AND product_price >= #{priceFrom}
+       </if>
+       <if test="priceTo != null">
+           AND product_price &lt;= #{priceTo}
+       </if>
+       ORDER BY product_id DESC
+       LIMIT #{offset}, #{pageSize}
+   </select>
+
+
+   <select id="countFilteredProducts"  parameterType="map" resultType="int">
+       SELECT COUNT(*) FROM mst_product
+       WHERE 1=1
+       <if test="name != null and name != ''">
+           AND product_name LIKE CONCAT('%', #{name}, '%')
+       </if>
+       <if test="status != null and status != ''">
+           AND is_sales = #{status}
+       </if>
+       <if test="priceFrom != null">
+           AND product_price >= #{priceFrom}
+       </if>
+       <if test="priceTo != null">
+           AND product_price &lt;= #{priceTo}
+       </if>
+   </select>
+
+    <update id="deleteProduct">
+        UPDATE mst_product
+        SET is_sales = 0, updated_at = NOW()
+        WHERE product_id = #{product_id}
+    </update>
+    
+    <insert id="addProduct">
+        INSERT INTO mst_product(product_id, product_name, product_image, product_price, is_sales, description)
+        VALUE (#{id}, #{name}, #{url}, #{price}, #{status}, #{description})
+    </insert>
+
+    <select id="getLastProductIdByPrefix" parameterType="string" resultType="string">
+        SELECT product_id
+        FROM mst_product
+        WHERE product_id LIKE CONCAT(#{prefix}, '%')
+        ORDER BY product_id DESC
+        LIMIT 1
+    </select>
+
+</mapper>

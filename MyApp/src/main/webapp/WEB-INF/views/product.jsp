@@ -142,10 +142,14 @@
                                             console.log('Response:', response);
                                             const startIndex = (page - 1) * response.pageSize;
                                             $.each(response.products, function (index, product) {
+                                                let decodedImageUrl = 'https://res.cloudinary.com/dhis8yzem/image/upload/v1741008403/Avatar_default_zfdjrk.png'
+                                                if(product.product_image){
+                                                    decodedImageUrl = product.product_image.replace(/\\\//g, '/');                                                   
+                                                }
                                                 let row = '<tr>' +
                                                     '<td>' + (startIndex + index + 1) + '</td>' +
                                                     '<td>' +
-                                                    '<span class="product-name" data-image-url="' + (product.image_url || 'https://res.cloudinary.com/dhis8yzem/image/upload/v1741008403/Avatar_default_zfdjrk.png') + '">' +
+                                                    '<span class="product-name" data-image-url="' + decodedImageUrl + '">' +
                                                     product.product_name +
                                                     '</span>' +
                                                     '</td>' +
@@ -153,7 +157,7 @@
                                                     '<td>' + '$' + product.product_price + '</td>' +
                                                     '<td>' + (product.is_sales == 1 ? '<span class="text-success">Đang bán</span>' : '<span class="text-danger">Ngừng bán</span>') + '</td>' +
                                                     '<td>' +
-                                                    '<a class="editUser text-info mr-2" data-id="' + product.product_id + '"><i class="bi bi-pencil-fill" style="color: blue"></i></a>' +
+                                                    '<a class="editUser text-info mr-2" href="productDetail.action?productId=' + (product.product_id || '' )+ '"><i class="bi bi-pencil-fill" style="color: blue"></i></a>' +
                                                     '<a href="#" class="deleteProduct text-danger mr-2" data-id="' + product.product_id + '"><i class="bi bi-trash-fill" style="color: red;"></i></a>' +
 
                                                     '</td>' +

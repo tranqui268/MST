@@ -1,5 +1,6 @@
 package org.example.service;
 
+import cz.jirutka.unidecode.Unidecode;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
@@ -72,7 +73,24 @@ public class ProductService {
             e.printStackTrace();
             return 0;
         }
+    }
 
+    public Product getProductById(String id){
+        try(SqlSession session = sqlSessionFactory.openSession()){
+            ProductMapper mapper = session.getMapper(ProductMapper.class);
+            return mapper.getProductById(id);
+        }
+    }
+
+    public int updateProduct(String id,String name, String url, Double price, int status, String description){
+        try(SqlSession session = sqlSessionFactory.openSession(true)){
+            ProductMapper mapper = session.getMapper(ProductMapper.class);
+            return mapper.updateProduct(id, name, url, price, status, description);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return 0;
+        }
     }
 
     private String generateProductId(String productName) {
@@ -82,17 +100,14 @@ public class ProductService {
                 throw new IllegalArgumentException("Tên sản phẩm không được để trống.");
             }
 
+            Unidecode unidecode = Unidecode.toAscii();
+
 
             String firstChar = productName.trim().substring(0, 1).toUpperCase();
 
-            firstChar = Normalizer.normalize(firstChar, Normalizer.Form.NFD)
-                    .replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
-            if (firstChar.equals("Đ")) {
-                firstChar = "D";
-            }
 
             // Lấy số thứ tự lớn nhất hiện tại cho chữ cái đầu này
-            String prefix = firstChar;
+            String prefix = unidecode.decode(firstChar);
             String lastProductId = mapper.getLastProductIdByPrefix(prefix);
             int sequenceNumber = 1;
 

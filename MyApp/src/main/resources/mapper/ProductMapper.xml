@@ -18,7 +18,7 @@
        <if test="priceTo != null">
            AND product_price &lt;= #{priceTo}
        </if>
-       ORDER BY product_id DESC
+       ORDER BY created_at DESC
        LIMIT #{offset}, #{pageSize}
    </select>
 
@@ -48,7 +48,7 @@
     
     <insert id="addProduct">
         INSERT INTO mst_product(product_id, product_name, product_image, product_price, is_sales, description)
-        VALUE (#{id}, #{name}, #{url}, #{price}, #{status}, #{description})
+        VALUE (#{product_id}, #{product_name}, #{product_image}, #{product_price}, #{is_sales}, #{description})
     </insert>
 
     <select id="getLastProductIdByPrefix" parameterType="string" resultType="string">
@@ -58,5 +58,21 @@
         ORDER BY product_id DESC
         LIMIT 1
     </select>
+
+    <select id="getProductById" resultType="org.example.model.Product">
+        SELECT * FROM mst_product
+        WHERE product_id = #{productId}
+    </select>
+
+    <update id="updateProduct">
+        UPDATE mst_product
+        SET product_name = #{product_name},
+            product_image = #{product_image},
+            product_price = #{product_price},
+            is_sales = #{is_sales},
+            description = #{description},
+            updated_at = NOW()
+        WHERE product_id = #{product_id}
+    </update>
 
 </mapper>

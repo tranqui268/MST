@@ -22,4 +22,14 @@ public interface ProductMapper {
     );
 
     String getLastProductIdByPrefix(String prefix);
+
+    Product getProductById(String productId);
+    int updateProduct(
+            @Param("product_id") String id,
+            @Param("product_name") String name,
+            @Param("product_image") String url,
+            @Param("product_price") Double price,
+            @Param("is_sales") int status,
+            @Param("description") String description
+    );
 }

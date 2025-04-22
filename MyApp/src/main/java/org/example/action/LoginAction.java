@@ -1,6 +1,6 @@
 package org.example.action;
 
-import com.opensymphony.xwork2.ActionContext;
+
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.ServletActionContext;
 import org.example.model.User;

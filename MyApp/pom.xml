@@ -75,10 +75,17 @@
             <version>2.15.1</version>
         </dependency>
 
+
         <dependency>
             <groupId>com.cloudinary</groupId>
             <artifactId>cloudinary-http44</artifactId>
             <version>1.38.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cz.jirutka.unidecode</groupId>
+            <artifactId>unidecode</artifactId>
+            <version>1.0.1</version>
         </dependency>
 
     </dependencies>
@@ -100,15 +107,15 @@
                 <artifactId>jetty-maven-plugin</artifactId>
                 <version>9.4.53.v20231009</version>
                 <configuration>
-                        <webApp>
-                            <contextPath>/${build.finalName}</contextPath>
-                        </webApp>
-                        <stopKey>CTRL+C</stopKey>
-                        <stopPort>8999</stopPort>
-                        <scanIntervalSeconds>10</scanIntervalSeconds>
-                        <scanTargets>
-                            <scanTarget>src/main/webapp/WEB-INF/web.xml</scanTarget>
-                        </scanTargets>
+                    <webApp>
+                        <contextPath>/${build.finalName}</contextPath>
+                    </webApp>
+                    <stopKey>CTRL+C</stopKey>
+                    <stopPort>8999</stopPort>
+                    <scanIntervalSeconds>10</scanIntervalSeconds>
+                    <scanTargets>
+                        <scanTarget>src/main/webapp/WEB-INF/web.xml</scanTarget>
+                    </scanTargets>
                 </configuration>
             </plugin>
         </plugins>

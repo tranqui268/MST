@@ -2,7 +2,6 @@
 <!DOCTYPE struts PUBLIC
         "-//Apache Software Foundation//DTD Struts Configuration 2.5//EN"
         "http://struts.apache.org/dtds/struts-2.5.dtd">
-
 <struts>
     <package name="basicstruct2" extends="json-default">
         <interceptors>
@@ -33,7 +32,6 @@
         <action name="login" class="org.example.action.LoginAction" method="execute">
             <interceptor-ref name="secureStack"/>
             <result name="success" type="redirect">user.action</result>
-
             <result name="error">/WEB-INF/views/login.jsp</result>
             <result name="input">/WEB-INF/views/login.jsp</result>
             <result name="invalid.token">/WEB-INF/views/invalidToken.jsp</result>
@@ -146,6 +144,22 @@
             <interceptor-ref name="defaultStack"/>
             <result name="success" type="json">/WEB-INF/views/productDetail.jsp</result>
         </action>
+
+        <action name="getProductById" class="org.example.action.ProductInsert" method="getProductById">
+            <result name="success" type="json">
+
+            </result>
+        </action>
+
+        <action name="updateProduct" class="org.example.action.ProductInsert" method="updateProduct">
+            <interceptor-ref name="fileUpload">
+                <param name="allowedTypes">image/png,image/jpeg</param>
+                <param name="maximumSize">2097152</param> <!-- 2MB -->
+            </interceptor-ref>
+            <interceptor-ref name="defaultStack"/>
+            <result name="success" type="json">/WEB-INF/views/productDetail.jsp</result>
+        </action>
+
 
     </package>
 

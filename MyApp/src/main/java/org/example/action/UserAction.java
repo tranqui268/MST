@@ -2,6 +2,9 @@ package org.example.action;
 
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.json.annotations.JSON;
+import org.example.dto.AddResponse;
+import org.example.dto.MessageResponse;
+import org.example.dto.PaginationResponse;
 import org.example.model.User;
 import org.example.service.UserService;
 
@@ -15,7 +18,6 @@ public class UserAction extends ActionSupport {
     private int totalUsers;
     private int totalPages;
     private List<User> users;
-    private boolean success;
 
     private Map<String, Object> paginationInfo;
     private UserService userService;
@@ -25,6 +27,20 @@ public class UserAction extends ActionSupport {
     private String email;
     private String group;
     private String status;
+
+    // delete
+    private int id;
+
+    // add, update
+    private String password;
+
+    // update permission;
+    private int isActive;
+
+    // Response
+    private PaginationResponse<List<User>> paginationResponse;
+    private MessageResponse messageResponse;
+
 
     public UserAction() throws Exception{
         userService = new UserService();
@@ -37,9 +53,13 @@ public class UserAction extends ActionSupport {
     }
 
     public String getListUserFilter(){
+        paginationResponse = new PaginationResponse<>();
         System.out.println("DATARESULT" + name + email + group + status);
         users = userService.getUsersWithPagination(name,email,group,status,page,pageSize);
         System.out.println("Users after filter: " + users);
+        for (User user : users) {
+            user.setPassword("**********");
+        }
 
         totalUsers = userService.countUsers(name,email,group,status);
         totalPages = (int) Math.ceil((double) totalUsers / pageSize);
@@ -48,6 +68,87 @@ public class UserAction extends ActionSupport {
         paginationInfo.put("pageSize", pageSize);
         paginationInfo.put("totalUsers", totalUsers);
         paginationInfo.put("totalPages", totalPages);
+
+        if (users != null){
+            paginationResponse.setData(users);
+            paginationResponse.setPaginationInfo(paginationInfo);
+            paginationResponse.setSuccess(true);
+            paginationResponse.setMessage("Lấy dữ liệu thành công");
+        }else {
+            paginationResponse.setData(null);
+            paginationResponse.setPaginationInfo(null);
+            paginationResponse.setSuccess(false);
+            paginationResponse.setMessage("Lấy dữ liệu thất bại");
+        }
+
+        return SUCCESS;
+    }
+
+    public String deleteUser (){
+        messageResponse = new MessageResponse();
+        int row = userService.deleteUser(id);
+        if (row > 0){
+            messageResponse.setSuccess(true);
+            messageResponse.setMessage("Xóa thành công");
+        }
+        else{
+            messageResponse.setSuccess(false);
+            messageResponse.setMessage("Xóa thất bại");
+        }
+        return SUCCESS;
+    }
+
+    public String addUser (){
+        messageResponse = new MessageResponse();
+        int rowAdd = userService.addUser(name, email,password, group);
+        if (rowAdd > 0){
+            messageResponse.setSuccess(true);
+            messageResponse.setMessage("Thêm thành công");
+        }else {
+            messageResponse.setSuccess(false);
+            messageResponse.setMessage("Thêm thất bại");
+        }
+        return SUCCESS;
+    }
+
+    public String updateUser (){
+        messageResponse = new MessageResponse();
+        int rowEdit = userService.updateUser(id,name,email,password,group);
+        if (rowEdit > 0){
+            messageResponse.setSuccess(true);
+            messageResponse.setMessage("Sửa thành công");
+        }else {
+            messageResponse.setSuccess(false);
+            messageResponse.setMessage("Sửa thất bại");
+        }
+        return SUCCESS;
+    }
+
+    public String checkEmailExist(){
+        User user = userService.getUserByEmail(id,email);
+        messageResponse = new MessageResponse();
+        if (user != null){
+            messageResponse.setSuccess(true);
+            messageResponse.setMessage("Email chưa tồn tại");
+        }else {
+            messageResponse.setSuccess(false);
+            messageResponse.setMessage("Email đã tồn tại");
+        }
+        return SUCCESS;
+    }
+
+    public String managePermission(){
+        messageResponse = new MessageResponse();
+        System.out.println("IDACTIVE" + id + "-" +isActive);
+        int rowUpdate = userService.updateIsActive(id, isActive);
+        if (rowUpdate > 0){
+            messageResponse.setSuccess(true);
+            messageResponse.setMessage("Cập nhật thành công ");
+        }else {
+            messageResponse.setSuccess(false);
+            messageResponse.setMessage("Cập nhật thất bại");
+        }
+
         return SUCCESS;
     }
 
@@ -133,11 +234,43 @@ public class UserAction extends ActionSupport {
         this.status = status;
     }
 
-    public boolean isSuccess() {
-        return success;
+    public PaginationResponse<List<User>> getPaginationResponse() {
+        return paginationResponse;
     }
 
-    public void setSuccess(boolean success) {
-        this.success = success;
+    public void setPaginationResponse(PaginationResponse<List<User>> paginationResponse) {
+        this.paginationResponse = paginationResponse;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public int getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(int isActive) {
+        this.isActive = isActive;
+    }
+
+    public MessageResponse getMessageResponse() {
+        return messageResponse;
+    }
+
+    public void setMessageResponse(MessageResponse messageResponse) {
+        this.messageResponse = messageResponse;
     }
 }

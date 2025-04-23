@@ -138,10 +138,10 @@
 
 
                                         // Hiển thị danh sách user
-                                        if (response.products && response.products.length > 0) {
+                                        if (response.data && response.data.length > 0) {
                                             console.log('Response:', response);
-                                            const startIndex = (page - 1) * response.pageSize;
-                                            $.each(response.products, function (index, product) {
+                                            const startIndex = (page - 1) * response.paginationInfo.pageSize;
+                                            $.each(response.data, function (index, product) {
                                                 let decodedImageUrl = 'https://res.cloudinary.com/dhis8yzem/image/upload/v1741008403/Avatar_default_zfdjrk.png'
                                                 if(product.product_image){
                                                     decodedImageUrl = product.product_image.replace(/\\\//g, '/');                                                   
@@ -165,7 +165,7 @@
                                                 tableBody.append(row);
                                             });
 
-                                            $('#total').html('<p>Hiển thị từ ' + (startIndex + 1) + ' ~ ' + (startIndex + response.products.length) + ' trong tổng số ' + response.totalProduct + ' sản phẩm</p>');
+                                            $('#total').html('<p>Hiển thị từ ' + (startIndex + 1) + ' ~ ' + (startIndex + response.data.length) + ' trong tổng số ' + response.paginationInfo.totalProduct + ' sản phẩm</p>');
                                             $('[data-toggle="tooltip"]').tooltip();
 
                                         } else {
@@ -255,7 +255,7 @@
                                         $.ajax({
                                             url: 'deleteProduct',
                                             method: 'POST',
-                                            data: { product_id: productId },
+                                            data: { productId: productId },
                                             success: function (response) {
                                                 if (response.success) {
                                                     alert("Xóa thành công!");

@@ -93,6 +93,6 @@
     <update id="updateUser">
         UPDATE mst_users
         SET name = #{name}, email = #{email}, group_role = #{groupRole}, password = #{password}
-        WHERE customer_id = #{customer_id}
+        WHERE id = #{id}
     </update>
 </mapper>

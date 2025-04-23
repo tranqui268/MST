@@ -205,10 +205,10 @@
 
 
                                         // Hiển thị danh sách user
-                                        if (response.users && response.users.length > 0) {
+                                        if (response.data && response.data.length > 0) {
                                             console.log('Response:', response);
-                                            const startIndex = (page - 1) * response.pageSize;
-                                            $.each(response.users, function (index, user) {
+                                            const startIndex = (page - 1) * response.paginationInfo.pageSize;
+                                            $.each(response.data, function (index, user) {
                                                 let row = '<tr>' +
                                                     '<td>' + (startIndex + index + 1) + '</td>' +
                                                     '<td>' + user.name + '</td>' +
@@ -224,7 +224,7 @@
                                                 tableBody.append(row);
                                             });
 
-                                            $('#total').html('<p>Hiển thị từ ' + (startIndex + 1) + ' ~ ' + (startIndex + response.users.length) + ' trong tổng số ' + response.totalUsers + ' khách hàng</p>');
+                                            $('#total').html('<p>Hiển thị từ ' + (startIndex + 1) + ' ~ ' + (startIndex + response.data.length) + ' trong tổng số ' + response.paginationInfo.totalUsers + ' khách hàng</p>');
 
 
                                         } else {
@@ -521,7 +521,7 @@
                                     },
                                     dataType: 'json',
                                     success: function (response) {
-                                        if (response.exist) {
+                                        if (response.success) {
                                             $('#emailError').text('Email đã tồn tại.');
                                         } else {
 
@@ -533,7 +533,7 @@
                                                     name: name,
                                                     email: email,
                                                     password: password,
-                                                    groupRole: groupRole
+                                                    group: groupRole
                                                 },
                                                 dataType: 'json',
                                                 success: function (response) {

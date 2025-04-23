@@ -3,6 +3,11 @@
         "-//Apache Software Foundation//DTD Struts Configuration 2.5//EN"
         "http://struts.apache.org/dtds/struts-2.5.dtd">
 <struts>
+    <constant name="struts.devMode" value="true" />
+    <constant name="struts.convention.classes.reload" value="true" />
+    <constant name="struts.convention.exclude.parentClassLoader" value="false" />
+    <constant name="struts.convention.action.fileProtocols" value="jar,code-source" />
+
     <package name="basicstruct2" extends="json-default">
         <interceptors>
             <interceptor name="methodFilter" class="org.example.interceptor.MethodFilterInterceptor"/>
@@ -51,27 +56,39 @@
         </action>
         <action name="getListUserFilter" class="org.example.action.UserAction" method="getListUserFilter">
             <interceptor-ref name="authStack"/>
-            <param name="includeProperties">users.*,paginationInfo.*</param>
-            <result name="success" type="json">/WEB-INF/views/user.jsp</result>
+
+            <result name="success" type="json">
+                <param name="root">paginationResponse</param>
+            </result>
         </action>
-        <action name="managePermission" class="org.example.action.UserManagePermission" method="managePermission">
+        <action name="managePermission" class="org.example.action.UserAction" method="managePermission">
             <interceptor-ref name="authStack"/>
-            <result name="success" type="json">/WEB-INF/views/user.jsp</result>
+            <result name="success" type="json">
+                <param name="root">messageResponse</param>
+            </result>
         </action>
-        <action name="checkEmailExist" class="org.example.action.UserExists" method="checkEmailExist">
-            <result name="success" type="json">/WEB-INF/views/user.jsp</result>
+        <action name="checkEmailExist" class="org.example.action.UserAction" method="checkEmailExist">
+            <result name="success" type="json">
+                <param name="root">messageResponse</param>
+            </result>
         </action>
-        <action name="addUser" class="org.example.action.UserInsert" method="addUser">
+        <action name="addUser" class="org.example.action.UserAction" method="addUser">
             <interceptor-ref name="authStack"/>
-            <result name="success" type="json">/WEB-INF/views/user.jsp</result>
+            <result name="success" type="json">
+                <param name="root">messageResponse</param>
+            </result>
         </action>
-        <action name="deleteUser" class="org.example.action.UserDelete" method="deleteUser">
+        <action name="deleteUser" class="org.example.action.UserAction" method="deleteUser">
             <interceptor-ref name="authStack"/>
-            <result name="success" type="json">/WEB-INF/views/user.jsp</result>
+            <result name="success" type="json">
+                <param name="root">messageResponse</param>
+            </result>
         </action>
-        <action name="updateUser" class="org.example.action.UserInsert" method="updateUser">
+        <action name="updateUser" class="org.example.action.UserAction" method="updateUser">
             <interceptor-ref name="authStack"/>
-            <result name="success" type="json">/WEB-INF/views/user.jsp</result>
+            <result name="success" type="json">
+                <param name="root">messageResponse</param>
+            </result>
         </action>
 
         <!--  Customer  -->
@@ -81,31 +98,43 @@
         </action>
         <action name="getFilteredCustomer" class="org.example.action.CustomerAction" method="getFilteredCustomer">
             <interceptor-ref name="authStack"/>
-            <param name="includeProperties">customers.*,paginationInfo.*</param>
-            <result name="success" type="json">/WEB-INF/views/customer.jsp</result>
+            <result name="success" type="json">
+                <param name="root">paginationResponse</param>
+            </result>
         </action>
-        <action name="checkCustomerExist" class="org.example.action.CustomerExists" method="checkCustomerExist">
-            <result name="success" type="json">/WEB-INF/views/customer.jsp</result>
+        <action name="checkCustomerExist" class="org.example.action.CustomerAction" method="checkCustomerExist">
+            <result name="success" type="json">
+                <param name="root">messageResponse</param>
+            </result>
         </action>
-        <action name="addCustomer" class="org.example.action.CustomerInsert" method="addCustomer">
+        <action name="addCustomer" class="org.example.action.CustomerAction" method="addCustomer">
             <interceptor-ref name="authStack"/>
-            <result name="success" type="json">/WEB-INF/views/customer.jsp</result>
+            <result name="success" type="json">
+                <param name="root">messageResponse</param>
+            </result>
         </action>
-        <action name="updateCustomer" class="org.example.action.CustomerInsert" method="updateCustomer">
+        <action name="updateCustomer" class="org.example.action.CustomerAction" method="updateCustomer">
             <interceptor-ref name="authStack"/>
-            <result name="success" type="json">/WEB-INF/views/customer.jsp</result>
+            <result name="success" type="json">
+                <param name="root">messageResponse</param>
+            </result>
         </action>
-        <action name="importCustomer" class="org.example.action.ImportCustomer" method="importFile">
+        <action name="importCustomer" class="org.example.action.CustomerAction" method="importFile">
             <interceptor-ref name="authStack"/>
             <interceptor-ref name="fileUpload">
                 <param name="allowedTypes">application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</param>
                 <param name="maximumSize">10485760</param>
             </interceptor-ref>
             <interceptor-ref name="secureStack"/>
-            <result name="success" type="json">/WEB-INF/views/customer.jsp</result>
+            <result name="success" type="json">
+                <param name="root">fileResponse</param>
+            </result>
         </action>
-        <action name="exportCustomer" class="org.example.action.ExportCustomer">
+        <action name="exportCustomer" class="org.example.action.CustomerAction" method="exportFile">
             <interceptor-ref name="authStack"/>
+            <result name="none" type="json">
+                <param name="root">messageResponse</param>
+            </result>
         </action>
 
         <!--  product  -->
@@ -115,12 +144,15 @@
         </action>
         <action name="getListProductFilter" class="org.example.action.ProductAction" method="getListProductFilter">
             <interceptor-ref name="authStack"/>
-            <param name="includeProperties">products.*,paginationInfo.*</param>
-            <result name="success" type="json">/WEB-INF/views/product.jsp</result>
+            <result name="success" type="json">
+                <param name="root">paginationResponse</param>
+            </result>
         </action>
-        <action name="deleteProduct" class="org.example.action.ProductDelete" method="deleteProduct">
+        <action name="deleteProduct" class="org.example.action.ProductAction" method="deleteProduct">
             <interceptor-ref name="authStack"/>
-            <result name="success" type="json">/WEB-INF/views/product.jsp</result>
+            <result name="success" type="json">
+                <param name="root">messageResponse</param>
+            </result>
         </action>
         <action name="uploadImage" class="org.example.action.CloudinaryAction" method="upload">
             <interceptor-ref name="fileUpload">
@@ -136,32 +168,33 @@
             <interceptor-ref name="authStack"/>
             <result name="success">/WEB-INF/views/productDetail.jsp</result>
         </action>
-        <action name="addProduct" class="org.example.action.ProductInsert" method="addProduct">
+        <action name="addProduct" class="org.example.action.ProductAction" method="addProduct">
             <interceptor-ref name="fileUpload">
                 <param name="allowedTypes">image/png,image/jpeg</param>
                 <param name="maximumSize">2097152</param> <!-- 2MB -->
             </interceptor-ref>
             <interceptor-ref name="defaultStack"/>
-            <result name="success" type="json">/WEB-INF/views/productDetail.jsp</result>
-        </action>
-
-        <action name="getProductById" class="org.example.action.ProductInsert" method="getProductById">
             <result name="success" type="json">
-
+                <param name="root">messageResponse</param>
             </result>
         </action>
 
-        <action name="updateProduct" class="org.example.action.ProductInsert" method="updateProduct">
+        <action name="getProductById" class="org.example.action.ProductAction" method="getProductById">
+            <result name="success" type="json">
+                <param name="root">productBaseResponse</param>
+            </result>
+        </action>
+
+        <action name="updateProduct" class="org.example.action.ProductAction" method="updateProduct">
             <interceptor-ref name="fileUpload">
                 <param name="allowedTypes">image/png,image/jpeg</param>
                 <param name="maximumSize">2097152</param> <!-- 2MB -->
             </interceptor-ref>
             <interceptor-ref name="defaultStack"/>
-            <result name="success" type="json">/WEB-INF/views/productDetail.jsp</result>
+            <result name="success" type="json">
+                <param name="root">messageResponse</param>
+            </result>
         </action>
 
-
     </package>
-
-
 </struts>

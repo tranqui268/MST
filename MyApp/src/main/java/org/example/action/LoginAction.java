@@ -3,6 +3,7 @@ package org.example.action;
 
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.ServletActionContext;
+import org.example.dto.MessageResponse;
 import org.example.model.User;
 import org.example.service.UserService;
 import org.example.util.JwtUtil;
@@ -11,12 +12,15 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.Serial;
 
 
 public class LoginAction extends ActionSupport {
     private String email;
     private String password;
-    private String message;
+
+    // response
+    private MessageResponse messageResponse;
 
     private UserService userService;
     public LoginAction() throws Exception{
@@ -28,6 +32,7 @@ public class LoginAction extends ActionSupport {
     public String execute() throws Exception {
         HttpServletRequest request = ServletActionContext.getRequest();
         String method = request.getMethod();
+        messageResponse = new MessageResponse();
         String rememberParam = request.getParameter("remember");
 
         if ("GET".equalsIgnoreCase(method)){
@@ -35,6 +40,8 @@ public class LoginAction extends ActionSupport {
         }
 
         if (email == null || password ==null){
+            messageResponse.setSuccess(false);
+            messageResponse.setMessage("Đăng nhập thành công");
             return INPUT;
         }
 
@@ -56,9 +63,13 @@ public class LoginAction extends ActionSupport {
             if ("on".equalsIgnoreCase(rememberParam)){
                 userService.updateRememberToken(user.getId(),token);
             }
+            password = null;
+            messageResponse.setSuccess(true);
+            messageResponse.setMessage("Đăng nhập thành công");
             return SUCCESS;
         }else {
-            message = "Email or password incorrect!";
+            messageResponse.setSuccess(false);
+            messageResponse.setMessage("Đăng nhập thất bại");
             return ERROR;
         }
     }
@@ -89,13 +100,11 @@ public class LoginAction extends ActionSupport {
         this.password = password;
     }
 
-    public String getMessage() {
-        return message;
+    public MessageResponse getMessageResponse() {
+        return messageResponse;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setMessageResponse(MessageResponse messageResponse) {
+        this.messageResponse = messageResponse;
     }
-
-
 }

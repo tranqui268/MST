@@ -115,10 +115,10 @@ public class UserService {
         }
     }
 
-    public int addUser(String name, String email,String groupRole){
+    public int addUser(String name, String email,String password, String groupRole){
         try (SqlSession session = sqlSessionFactory.openSession(true)) {
             UserMapper mapper = session.getMapper(UserMapper.class);
-            return mapper.addUser(name, email, "password1234", groupRole);
+            return mapper.addUser(name, email, password, groupRole);
         }catch (Exception e){
             e.printStackTrace();
             return 0;

@@ -183,10 +183,10 @@
 
 
                                         // Hiển thị danh sách user
-                                        if (response.customers && response.customers.length > 0) {
+                                        if (response.data && response.data.length > 0) {
                                             console.log('Response:', response);
-                                            const startIndex = (page - 1) * response.pageSize;
-                                            $.each(response.customers, function (index, customer) {
+                                            const startIndex = (page - 1) * response.paginationInfo.pageSize;
+                                            $.each(response.data, function (index, customer) {
                                                 let row = '<tr>' +
                                                     '<td>' + (startIndex + index + 1) + '</td>' +
                                                     '<td>' + customer.customer_name + '</td>' +
@@ -200,7 +200,7 @@
                                                 tableBody.append(row);
                                             });
 
-                                            $('#total').html('<p>Hiển thị từ ' + (startIndex + 1) + ' ~ ' + (startIndex + response.customers.length) + ' trong tổng số ' + response.totalCustomers + ' khách hàng</p>');
+                                            $('#total').html('<p>Hiển thị từ ' + (startIndex + 1) + ' ~ ' + (startIndex + response.data.length) + ' trong tổng số ' + response.paginationInfo.totalCustomers + ' khách hàng</p>');
 
 
                                         } else {

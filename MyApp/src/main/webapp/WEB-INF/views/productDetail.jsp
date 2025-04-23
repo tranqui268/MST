@@ -146,8 +146,8 @@
                             data: { productId: productId },
                             dataType: 'json',
                             success: function (response) {
-                                if (response.success && response.product) {
-                                    const product = response.product;
+                                if (response.success && response.data) {
+                                    const product = response.data;
 
 
 

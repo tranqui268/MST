@@ -7,6 +7,7 @@ import org.example.dto.MessageResponse;
 import org.example.dto.PaginationResponse;
 import org.example.model.User;
 import org.example.service.UserService;
+import org.example.util.Validate;
 
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +38,9 @@ public class UserAction extends ActionSupport {
     // update permission;
     private int isActive;
 
+    // deleteUsersBulk
+    private List<Integer> selectedIds;
+
     // Response
     private PaginationResponse<List<User>> paginationResponse;
     private MessageResponse messageResponse;
@@ -54,12 +58,53 @@ public class UserAction extends ActionSupport {
 
     public String getListUserFilter(){
         paginationResponse = new PaginationResponse<>();
+        boolean check = true;
         System.out.println("DATARESULT" + name + email + group + status);
+
+        String nameError = Validate.validateInput(name);
+        if (nameError != null){
+            paginationResponse.setMessage(nameError);
+            check = false;
+        }
+
+        String emailError = Validate.validateEmail(email,false);
+        if (emailError != null){
+            paginationResponse.setMessage(emailError);
+            check = false;
+
+        }
+
+        String groupError = Validate.validateInput(group);
+        if (groupError != null){
+            paginationResponse.setMessage(groupError);
+            check = false;
+
+        }
+
+        String statusError = Validate.validateInput(status);
+        if (statusError != null){
+            paginationResponse.setMessage(statusError);
+            check = false;
+
+        }
+
+        String statusValueError = Validate.validateStatus(status);
+        if (statusValueError != null){
+            paginationResponse.setMessage(statusValueError);
+            check = false;
+        }
+
+        if (!check){
+            paginationResponse.setSuccess(false);
+            paginationResponse.setData(null);
+            paginationResponse.setPaginationInfo(null);
+            return SUCCESS;
+        }
+
+
+
         users = userService.getUsersWithPagination(name,email,group,status,page,pageSize);
         System.out.println("Users after filter: " + users);
-        for (User user : users) {
-            user.setPassword("**********");
-        }
 
         totalUsers = userService.countUsers(name,email,group,status);
         totalPages = (int) Math.ceil((double) totalUsers / pageSize);
@@ -100,6 +145,35 @@ public class UserAction extends ActionSupport {
 
     public String addUser (){
         messageResponse = new MessageResponse();
+        boolean check = true;
+
+
+        String nameError = Validate.validateInput(name);
+        if (nameError != null){
+            messageResponse.setMessage(nameError);
+            check = false;
+        }
+
+        String emailError = Validate.validateEmail(email, true);
+        if (emailError != null){
+            messageResponse.setMessage(emailError);
+            check = false;
+
+        }
+
+        String groupError = Validate.validateInput(group);
+        if (groupError != null){
+            messageResponse.setMessage(groupError);
+            check = false;
+
+        }
+
+
+        if (!check){
+            messageResponse.setSuccess(false);
+            return SUCCESS;
+        }
+
         int rowAdd = userService.addUser(name, email,password, group);
         if (rowAdd > 0){
             messageResponse.setSuccess(true);
@@ -113,6 +187,36 @@ public class UserAction extends ActionSupport {
 
     public String updateUser (){
         messageResponse = new MessageResponse();
+        System.out.println("DATARESULT" + name + email + group + status);
+        boolean check = true;
+
+
+        String nameError = Validate.validateInput(name);
+        if (nameError != null){
+            messageResponse.setMessage(nameError);
+            check = false;
+        }
+
+        String emailError = Validate.validateEmail(email, true);
+        if (emailError != null){
+            messageResponse.setMessage(emailError);
+            check = false;
+
+        }
+
+        String groupError = Validate.validateInput(group);
+        if (groupError != null){
+            messageResponse.setMessage(groupError);
+            check = false;
+
+        }
+
+
+        if (!check){
+            messageResponse.setSuccess(false);
+            return SUCCESS;
+        }
+
         int rowEdit = userService.updateUser(id,name,email,password,group);
         if (rowEdit > 0){
             messageResponse.setSuccess(true);
@@ -149,6 +253,19 @@ public class UserAction extends ActionSupport {
             messageResponse.setMessage("Cập nhật thất bại");
         }
 
+        return SUCCESS;
+    }
+
+    public String deleteUsersBulk(){
+        messageResponse = new MessageResponse();
+        int delete = userService.deleteUsersBulk(selectedIds);
+        if (delete > 0){
+            messageResponse.setSuccess(true);
+            messageResponse.setMessage("Xóa thành công ");
+        }else {
+            messageResponse.setSuccess(false);
+            messageResponse.setMessage("Xóa thất bại ");
+        }
         return SUCCESS;
     }
 
@@ -264,6 +381,14 @@ public class UserAction extends ActionSupport {
 
     public void setIsActive(int isActive) {
         this.isActive = isActive;
+    }
+
+    public List<Integer> getSelectedIds() {
+        return selectedIds;
+    }
+
+    public void setSelectedIds(List<Integer> selectedIds) {
+        this.selectedIds = selectedIds;
     }
 
     public MessageResponse getMessageResponse() {

@@ -9,6 +9,7 @@ import org.example.model.Product;
 import org.example.model.User;
 import org.example.service.CloudinaryService;
 import org.example.service.ProductService;
+import org.example.util.Validate;
 
 import java.io.File;
 import java.util.HashMap;
@@ -27,14 +28,14 @@ public class ProductAction  extends ActionSupport {
     // Filter
     private String name;
     private String status;
-    private Double priceFrom;
-    private Double priceTo;
+    private String priceFrom;
+    private String priceTo;
 
     // add product
     private File file;
     private String fileContentType;
-    private String fileName;
-    private Double price;
+    private String fileFileName;
+    private String price;
     private String description;
 
     // getProductById
@@ -42,6 +43,7 @@ public class ProductAction  extends ActionSupport {
 
     // update Product
     private String imageUrl;
+
 
 
     // Response
@@ -54,6 +56,7 @@ public class ProductAction  extends ActionSupport {
 
     public ProductAction() throws Exception {
         productService = new ProductService();
+        cloudinaryService = new CloudinaryService();
     }
 
 
@@ -62,10 +65,83 @@ public class ProductAction  extends ActionSupport {
     public String getListProductFilter(){
         paginationResponse = new PaginationResponse<>();
         System.out.println("DATARESULT" + name + status + priceFrom + priceTo);
-        products = productService.getProductsWithPagination(name,status,priceFrom,priceTo,page,pageSize);
+        boolean check = true;
+
+        String nameError = Validate.validateInput(name);
+        if (nameError != null){
+            paginationResponse.setMessage(nameError);
+            check = false;
+        }
+
+        String statusError = Validate.validateInput(status);
+        if (statusError != null){
+            paginationResponse.setMessage(statusError);
+            check = false;
+        }
+
+        String statusErrorValue = Validate.validateStatus(status);
+        if (statusErrorValue != null){
+            paginationResponse.setMessage(statusErrorValue);
+            check = false;
+        }
+
+        String priceFromError = Validate.validateNumber(priceFrom, "Price from");
+        if (priceFromError != null){
+            paginationResponse.setMessage(priceFromError);
+            check = false;
+        }
+
+        String priceToError = Validate.validateNumber(priceTo, "Price to");
+        if (priceToError != null){
+            paginationResponse.setMessage(priceToError);
+            check = false;
+        }
+
+        Double priceFromDouble = null;
+        Double priceToDouble = null;
+        try {
+            if (priceFrom != null && !priceFrom.trim().isEmpty()){
+                priceFromDouble = Double.parseDouble(priceFrom);
+            }
+            if (priceTo != null && !priceTo.trim().isEmpty()){
+                priceToDouble = Double.parseDouble(priceTo);
+            }
+        }catch (NumberFormatException e){
+            check = false;
+            paginationResponse.setMessage("Lỗi chuyển đổi giá trị giá.");
+        }
+
+        String priceFromDoubleError = Validate.validatePrice(priceFromDouble, "Price from");
+        if (priceFromDoubleError != null){
+            paginationResponse.setMessage(priceFromDoubleError);
+            check = false;
+        }
+
+        String priceToDoubleError = Validate.validatePrice(priceToDouble, "Price to");
+        if (priceToDoubleError != null){
+            paginationResponse.setMessage(priceToDoubleError);
+            check = false;
+        }
+
+        String priceRangeError = Validate.validatePriceRange(priceFromDouble, priceToDouble);
+        if (priceRangeError != null){
+            paginationResponse.setMessage(priceRangeError);
+            check = false;
+        }
+
+
+
+        if (!check){
+            paginationResponse.setSuccess(false);
+            paginationResponse.setData(null);
+            paginationResponse.setPaginationInfo(null);
+            return SUCCESS;
+        }
+
+        products = productService.getProductsWithPagination(name,status,priceFromDouble,priceToDouble,page,pageSize);
         System.out.println("Users after filter: " + products);
 
-        totalProduct = productService.countProducts(name,status,priceFrom,priceTo);
+        totalProduct = productService.countProducts(name,status,priceFromDouble,priceToDouble);
         totalPages = (int) Math.ceil((double) totalProduct / pageSize);
         paginationInfo = new HashMap<>();
         paginationInfo.put("currentPage", page);
@@ -88,11 +164,57 @@ public class ProductAction  extends ActionSupport {
     }
 
     public String addProduct() throws Exception {
-       messageResponse = new MessageResponse();
+        messageResponse = new MessageResponse();
+        boolean check = true;
+        String nameError = Validate.validateInput(name);
+        if (nameError != null){
+            messageResponse.setMessage(nameError);
+            check = false;
+        }
 
+        String statusError = Validate.validateInput(status);
+        if (statusError != null){
+            messageResponse.setMessage(statusError);
+            check = false;
+        }
+
+        String priceError = Validate.validateNumber(price, "Price");
+        if (priceError != null){
+            messageResponse.setMessage(priceError);
+            check = false;
+        }
+
+
+
+        Double priceDouble= null;
+        try {
+            if (price != null && !price.trim().isEmpty()){
+                priceDouble = Double.parseDouble(price);
+            }
+        }catch (NumberFormatException e){
+            check = false;
+            messageResponse.setMessage("Lỗi chuyển đổi giá trị giá.");
+        }
+
+        String priceDoubleError = Validate.validatePrice(priceDouble, "Price");
+        if (priceDoubleError != null){
+            messageResponse.setMessage(priceDoubleError);
+            check = false;
+        }
+
+
+
+
+        if (!check){
+            messageResponse.setSuccess(false);
+            return SUCCESS;
+        }
+
+
+        System.out.println("SEND-FILE" + file);
         String url = cloudinaryService.uploadImage(file);
         System.out.println("ACTION---Url : "+ url +" name: " + name + "Price: " + price +"Status: " + status+" Description: " + description);
-        int rowInsert = productService.addProduct(name, url, price, Integer.parseInt(status),description);
+        int rowInsert = productService.addProduct(name, url, priceDouble, Integer.parseInt(status),description);
         if (rowInsert > 0){
             messageResponse.setSuccess(true);
             messageResponse.setMessage("Thêm sản phẩm thành công");
@@ -122,6 +244,53 @@ public class ProductAction  extends ActionSupport {
 
     public String updateProduct() throws Exception {
         messageResponse = new MessageResponse();
+        boolean check = true;
+        String nameError = Validate.validateInput(name);
+        if (nameError != null){
+            messageResponse.setMessage(nameError);
+            check = false;
+        }
+
+        String statusError = Validate.validateInput(status);
+        if (statusError != null){
+            messageResponse.setMessage(statusError);
+            check = false;
+        }
+
+        String priceError = Validate.validateNumber(price, "Price");
+        if (priceError != null){
+            messageResponse.setMessage(priceError);
+            check = false;
+        }
+
+
+
+        Double priceDouble= null;
+        try {
+            if (price != null && !price.trim().isEmpty()){
+                priceDouble = Double.parseDouble(price);
+            }
+        }catch (NumberFormatException e){
+            check = false;
+            messageResponse.setMessage("Lỗi chuyển đổi giá trị giá.");
+        }
+
+        String priceDoubleError = Validate.validatePrice(priceDouble, "Price");
+        if (priceDoubleError != null){
+            messageResponse.setMessage(priceDoubleError);
+            check = false;
+        }
+
+
+
+
+        if (!check){
+            messageResponse.setSuccess(false);
+            return SUCCESS;
+        }
+
+
+        System.out.println("SEND-FILE" + file);
         String url = "";
         if (file != null){
             url = cloudinaryService.uploadImage(file);
@@ -129,7 +298,7 @@ public class ProductAction  extends ActionSupport {
             url = imageUrl;
         }
         System.out.println("ACTION---Url : "+ url +" name: " + name + "Price: " + price +"Status: " + status+" Description: " + description);
-        int rowInsert = productService.updateProduct(productId,name, url, price, Integer.parseInt(status),description);
+        int rowInsert = productService.updateProduct(productId,name, url, priceDouble, Integer.parseInt(status),description);
         if (rowInsert > 0){
             messageResponse.setSuccess(true);
             messageResponse.setMessage("Sửa thành công");
@@ -155,6 +324,7 @@ public class ProductAction  extends ActionSupport {
         }
         return SUCCESS;
     }
+
 
     public int getPage() {
         return page;
@@ -228,19 +398,19 @@ public class ProductAction  extends ActionSupport {
         this.status = status;
     }
 
-    public Double getPriceFrom() {
+    public String getPriceFrom() {
         return priceFrom;
     }
 
-    public void setPriceFrom(Double priceFrom) {
+    public void setPriceFrom(String priceFrom) {
         this.priceFrom = priceFrom;
     }
 
-    public Double getPriceTo() {
+    public String getPriceTo() {
         return priceTo;
     }
 
-    public void setPriceTo(Double priceTo) {
+    public void setPriceTo(String priceTo) {
         this.priceTo = priceTo;
     }
 
@@ -260,19 +430,19 @@ public class ProductAction  extends ActionSupport {
         this.fileContentType = fileContentType;
     }
 
-    public String getFileName() {
-        return fileName;
+    public String getFileFileName() {
+        return fileFileName;
     }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
+    public void setFileFileName(String fileFileName) {
+        this.fileFileName = fileFileName;
     }
 
-    public Double getPrice() {
+    public String getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(String price) {
         this.price = price;
     }
 
@@ -323,4 +493,5 @@ public class ProductAction  extends ActionSupport {
     public void setProductBaseResponse(BaseResponse<Product> productBaseResponse) {
         this.productBaseResponse = productBaseResponse;
     }
+
 }

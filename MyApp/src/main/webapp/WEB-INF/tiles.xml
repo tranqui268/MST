@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE tiles-definitions PUBLIC
+        "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+        "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+<tiles-definitions>
+<!--    &lt;!&ndash; Base Definition &ndash;&gt;-->
+    <definition name="base.definition" template="/WEB-INF/views/layouts/baseLayout.jsp">
+        <put-attribute name="title" value="Default Title" />
+        <put-attribute name="navbar" value="/WEB-INF/views/common/navbar.jsp" />
+        <put-attribute name="body" value="" />
+        <put-attribute name="modal" value="/WEB-INF/views/common/modelPopup.jsp"/>
+        <put-attribute name="page-scripts" value=""/>
+    </definition>
+
+    <!-- Empty Layout for login/error pages -->
+    <definition name="empty.definition" template="/WEB-INF/views/layouts/emptyLayout.jsp">
+        <put-attribute name="title" value="Empty" />
+        <put-attribute name="body" value="" />
+        <put-attribute name="page-scripts" value=""/>
+    </definition>
+
+    <!-- Page Definitions -->
+    <definition name="welcome" extends="base.definition">
+        <put-attribute name="title" value="Welcome" />
+        <put-attribute name="body" value="/WEB-INF/views/pages/welcome.jsp" />
+    </definition>
+
+    <definition name="user" extends="base.definition">
+        <put-attribute name="title" value="User Management" />
+        <put-attribute name="body" value="/WEB-INF/views/pages/user.jsp" />
+        <put-attribute name="page-scripts" value="/WEB-INF/views/scripts/user-script.jsp"/>
+    </definition>
+
+    <definition name="product" extends="base.definition">
+        <put-attribute name="title" value="Product Management" />
+        <put-attribute name="body" value="/WEB-INF/views/pages/product.jsp" />
+        <put-attribute name="page-scripts" value="/WEB-INF/views/scripts/product-script.jsp"/>
+    </definition>
+
+    <definition name="productDetail" extends="empty.definition">
+        <put-attribute name="title" value="Product Detail" />
+        <put-attribute name="body" value="/WEB-INF/views/pages/productDetail.jsp" />
+        <put-attribute name="page-scripts" value="/WEB-INF/views/scripts/productDetail-script.jsp"/>
+    </definition>
+
+    <definition name="customer" extends="base.definition">
+        <put-attribute name="title" value="Customer Management" />
+        <put-attribute name="body" value="/WEB-INF/views/pages/customer.jsp" />
+        <put-attribute name="page-scripts" value="/WEB-INF/views/scripts/customer-script.jsp"/>
+    </definition>
+
+    <!-- Login page with empty layout -->
+    <definition name="login" extends="empty.definition">
+        <put-attribute name="title" value="Login" />
+        <put-attribute name="body" value="/WEB-INF/views/pages/login.jsp" />
+        <put-attribute name="page-scripts" value="/WEB-INF/views/scripts/login-script.jsp"/>
+    </definition>
+
+    <definition name="invalidToken" extends="empty.definition">
+        <put-attribute name="title" value="Invalid Token" />
+        <put-attribute name="body" value="/WEB-INF/views/pages/invalidToken.jsp" />
+    </definition>
+
+    <!-- Index page -->
+    <definition name="index" extends="base.definition">
+        <put-attribute name="title" value="Welcome" />
+        <put-attribute name="body" value="/WEB-INF/views/index.jsp" />
+    </definition>
+</tiles-definitions>

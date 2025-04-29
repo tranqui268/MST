@@ -17,4 +17,14 @@
     <welcome-file-list>
         <welcome-file>index</welcome-file>
     </welcome-file-list>
+
+<!--    tiles -->
+    <context-param>
+        <param-name>org.apache.tiles.impl.BasicTilesContainer.DEFINITIONS_CONFIG</param-name>
+        <param-value>/WEB-INF/tiles.xml</param-value>
+    </context-param>
+
+    <listener>
+        <listener-class>org.apache.tiles.web.startup.simple.SimpleTilesListener</listener-class>
+    </listener>
 </web-app>

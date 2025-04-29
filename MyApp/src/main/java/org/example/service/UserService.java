@@ -6,6 +6,7 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.example.mapper.UserMapper;
 import org.example.model.User;
+import org.example.util.PasswordUtil;
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -26,7 +27,14 @@ public class UserService {
         System.out.println("Username: " + email + ", Password: " + password);
         try(SqlSession session = sqlSessionFactory.openSession()){
             UserMapper mapper = session.getMapper(UserMapper.class);
-            return mapper.findByUsernameAndPassword(email, password);
+            User user = mapper.findUserByEmail(email);
+            if (user != null){
+                boolean result = PasswordUtil.checkPassword(password, user.getPassword());
+                if (result){
+                    return user;
+                }
+            }
+            return null;
 
         }
     }
@@ -118,7 +126,7 @@ public class UserService {
     public int addUser(String name, String email,String password, String groupRole){
         try (SqlSession session = sqlSessionFactory.openSession(true)) {
             UserMapper mapper = session.getMapper(UserMapper.class);
-            return mapper.addUser(name, email, password, groupRole);
+            return mapper.addUser(name, email, PasswordUtil.hashPassword(password), groupRole);
         }catch (Exception e){
             e.printStackTrace();
             return 0;
@@ -139,11 +147,26 @@ public class UserService {
     public int updateUser(int id, String name, String email, String password, String groupRole){
         try (SqlSession session = sqlSessionFactory.openSession(true)) {
             UserMapper mapper = session.getMapper(UserMapper.class);
-            return mapper.updateUser(id, name, email, password, groupRole);
+            return mapper.updateUser(id, name, email, PasswordUtil.hashPassword(password), groupRole);
         }catch (Exception e){
             e.printStackTrace();
             return 0;
         }
+    }
+
+    public int deleteUsersBulk(List<Integer> ids){
+        if (ids != null && !ids.isEmpty()) {
+            try (SqlSession session = sqlSessionFactory.openSession(true)) {
+                UserMapper mapper = session.getMapper(UserMapper.class);
+                return mapper.deleteUsersBulk(ids);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return 0;
+            }
+        } else {
+            return 0;
+        }
+
     }
 
 

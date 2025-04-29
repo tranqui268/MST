@@ -1,100 +1,7 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-    <%@ taglib prefix="s" uri="/struts-tags" %>
-        <%@ page import="org.example.model.User" %>
-            <!DOCTYPE html>
-            <html>
-
-            <head>
-                <title>Product</title>
-                <link rel="stylesheet"
-                    href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
-                <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-
-            </head>
-            <style>
-                .product-name {
-                    position: relative;
-                    cursor: pointer;
-                }
-
-                .tooltip-image {
-                    position: absolute;
-                    z-index: 1000;
-                    top: -160px;
-                    left: 0;
-                    background: white;
-                    padding: 5px;
-                    border: 1px solid #ccc;
-                    border-radius: 4px;
-                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-                }
-            </style>
-
-            <body class="bg-light">
-                <s:set var="section" value="'product'" scope="request" />
-                <div class="container">
-                    <h2 class="bg-info text-white text-center">QUẢN LÝ SẢN PHẨM</h2>
-                </div>
-
-                <%@ include file="/WEB-INF/views/common/navbar.jsp" %>
-
-                    <div>
-                        <form id="searchForm" method="get" class="form-inline mb-2">
-                            <input id="searchName" type="text" name="name" placeholder="Nhập tên sản phẩm"
-                                class="form-control mr-1" />
-
-                            <select id="searchStatus" name="status" class="form-control mr-1">
-                                <option value="">Chọn trạng thái</option>
-                                <option value="1">Có hàng bán</option>
-                                <option value="0">Dừng bán</option>
-                            </select>
-                            <input id="priceFrom" type="number" name="priceFrom" placeholder="Giá bán từ" min="0"
-                                step="10" class="form-control mr-1" />
-                            <input id="priceTo" type="number" name="priceTo" placeholder="Giá bán đến" min="0" step="10"
-                                class="form-control mr-1" />
-
-
-                            <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> Tìm kiếm</button>
-                            <a href="#" id="clearSearchBtn" class="btn btn-secondary ml-1"><i
-                                    class="bi bi-x-circle"></i> Xóa tìm</a>
-                        </form>
-                        <a id="btnAdd" class="btn btn-secondary ml-1"><i class="bi bi-person-fill-add"
-                                style="color: blue"></i>Thêm mới</a>
-                        <div class="d-flex align-items-center justify-content-end" id="total">
-
-                        </div>
-
-                    </div>
-
-
-                    <table id="productTable" class="table table-bordered table-striped text-center">
-                        <thead class="thead-light">
-                            <tr>
-                                <th>#</th>
-                                <th>Tên sản phẩm</th>
-                                <th>Mô tả</th>
-                                <th>Giá</th>
-                                <th>Tình trạng</th>
-                                <th>Thao tác</th>
-                            </tr>
-                        </thead>
-                        <tbody id="productTableBody">
-
-                        </tbody>
-                    </table>
-
-
-                    <nav aria-label="Page navigation">
-                        <ul class="pagination justify-content-center" id="pagination">
-                        </ul>
-                    </nav>
-
-
-                    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-                    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-                    <script
-                        src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-                    <script>
+           <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+           <%@ taglib prefix="s" uri="/struts-tags" %>
+           <%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %>
+                 <script>
                         if (typeof jQuery === 'undefined') {
                             console.error('jQuery is not loaded!');
                         } else {
@@ -144,7 +51,7 @@
                                             $.each(response.data, function (index, product) {
                                                 let decodedImageUrl = 'https://res.cloudinary.com/dhis8yzem/image/upload/v1741008403/Avatar_default_zfdjrk.png'
                                                 if(product.product_image){
-                                                    decodedImageUrl = product.product_image.replace(/\\\//g, '/');                                                   
+                                                    decodedImageUrl = product.product_image.replace(/\\\//g, '/');
                                                 }
                                                 let row = '<tr>' +
                                                     '<td>' + (startIndex + index + 1) + '</td>' +
@@ -165,7 +72,7 @@
                                                 tableBody.append(row);
                                             });
 
-                                            $('#total').html('<p>Hiển thị từ ' + (startIndex + 1) + ' ~ ' + (startIndex + response.data.length) + ' trong tổng số ' + response.paginationInfo.totalProduct + ' sản phẩm</p>');
+                                            $('#total').html('<p>Hiển thị từ ' + (startIndex + 1) + ' ~ ' + (startIndex + response.data.length) + ' trong tổng số ' + response.paginationInfo.totalProducts + ' sản phẩm</p>');
                                             $('[data-toggle="tooltip"]').tooltip();
 
                                         } else {
@@ -175,9 +82,9 @@
                                         // Hiển thị phân trang
                                         let pagination = $('#pagination');
                                         pagination.empty();
-                                        let paginationInfo = response.paginationInfo;
-                                        let currentPage = paginationInfo.currentPage;
-                                        let totalPages = paginationInfo.totalPages;
+                                        let paginationInfo = response.paginationInfo ?? 0;
+                                        let currentPage = paginationInfo.currentPage ?? 0;
+                                        let totalPages = paginationInfo.totalPages ?? 0;
 
                                         // Nút Previous
                                         if (totalPages > 1) {
@@ -230,6 +137,7 @@
 
                             $('#clearSearchBtn').click(function (e) {
                                 e.preventDefault();
+                                loadProduct(1);
 
 
                                 $('#searchName').val('');
@@ -305,6 +213,3 @@
 
 
                     </script>
-            </body>
-
-            </html>

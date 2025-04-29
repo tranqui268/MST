@@ -79,6 +79,11 @@
         WHERE email = #{email} AND id != #{id}
     </select>
 
+    <select id="findUserByEmail" resultType="org.example.model.User">
+        SELECT * FROM mst_users
+        WHERE email = #{email}
+    </select>
+
     <insert id="addUser">
         INSERT INTO mst_users (name, email, password, group_role)
         VALUES (#{name}, #{email}, #{password}, #{groupRole})
@@ -95,4 +100,14 @@
         SET name = #{name}, email = #{email}, group_role = #{groupRole}, password = #{password}
         WHERE id = #{id}
     </update>
+
+    <update id="deleteUsersBulk" parameterType="list">
+        UPDATE mst_users
+        SET is_delete = 1
+        WHERE id IN
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
 </mapper>

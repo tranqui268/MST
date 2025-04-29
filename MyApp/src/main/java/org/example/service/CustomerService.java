@@ -60,6 +60,13 @@ public class CustomerService {
         }
     }
 
+    public Customer findByEmail(String email){
+        try (SqlSession session = sqlSessionFactory.openSession()){
+            CustomerMapper mapper = session.getMapper(CustomerMapper.class);
+            return mapper.findByEmail(email);
+        }
+    }
+
     public int addCustomer(String name, String email, String tel_num, String address){
         try (SqlSession session = sqlSessionFactory.openSession(true)){
             CustomerMapper mapper = session.getMapper(CustomerMapper.class);
@@ -101,12 +108,30 @@ public class CustomerService {
                     continue;
                 } else {
                     try {
-                        int result = addCustomer(name, email, phone, address);
-                        if (result == 0) {
-                            errors.add("Dòng " + (i + 1) + ": Lỗi khi thêm khách hàng vào database.");
-                        } else {
-                            System.out.println("Row " + (i + 1) + ": Added customer successfully");
+                        Customer existingCustomer = findByEmail(email);
+                        if (existingCustomer != null){
+                            boolean isSame = existingCustomer.getCustomer_name().equals(name) &&
+                                    existingCustomer.getTel_num().equals(phone) &&
+                                    existingCustomer.getAddress().equals(address);
+                            if (isSame){
+                                continue;
+                            }else {
+                                int result = updateUser(existingCustomer.getCustomer_id(),name, email, phone, address);
+                                if (result > 0) {
+                                    System.out.println("Row " + (i + 1) + ": Updated customer with email " + email + " successfully.");
+                                } else {
+                                    errors.add("Dòng " + (i + 1) + ": Lỗi khi cập nhật khách hàng với email " + email + ".");
+                                }
+                            }
+                        }else {
+                            int result = addCustomer(name, email, phone, address);
+                            if (result == 0) {
+                                errors.add("Dòng " + (i + 1) + ": Lỗi khi thêm khách hàng vào database.");
+                            } else {
+                                System.out.println("Row " + (i + 1) + ": Added customer successfully.");
+                            }
                         }
+
                     } catch (Exception e) {
                         errors.add("Dòng " + (i + 1) + ": Lỗi khi thêm khách hàng - " + e.getMessage());
                     }

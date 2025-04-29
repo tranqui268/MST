@@ -3,12 +3,21 @@
         "-//Apache Software Foundation//DTD Struts Configuration 2.5//EN"
         "http://struts.apache.org/dtds/struts-2.5.dtd">
 <struts>
-    <constant name="struts.devMode" value="true" />
-    <constant name="struts.convention.classes.reload" value="true" />
-    <constant name="struts.convention.exclude.parentClassLoader" value="false" />
-    <constant name="struts.convention.action.fileProtocols" value="jar,code-source" />
+    <constant name="struts.devMode" value="false" />
 
-    <package name="basicstruct2" extends="json-default">
+    <!--    tiles-->
+    <constant name="struts.tiles.definitions.file" value="/WEB-INF/tiles.xml" />
+    <constant name="struts.ui.templateSuffix" value="ftl" />
+    <constant name="struts.ui.theme" value="simple" />
+    <constant name="struts.ui.templateDir" value="template" />
+    <package name="tiles-default" extends="struts-default">
+        <result-types>
+            <result-type name="tiles" class="org.apache.struts2.views.tiles.TilesResult" />
+        </result-types>
+    </package>
+
+    <package name="basicstruct2" extends="json-default,tiles-default">
+
         <interceptors>
             <interceptor name="methodFilter" class="org.example.interceptor.MethodFilterInterceptor"/>
             <interceptor-stack name="secureStack">
@@ -36,19 +45,19 @@
 
         <action name="login" class="org.example.action.LoginAction" method="execute">
             <interceptor-ref name="secureStack"/>
-            <result name="success" type="redirect">user.action</result>
-            <result name="error">/WEB-INF/views/login.jsp</result>
-            <result name="input">/WEB-INF/views/login.jsp</result>
+            <result name="success" type="redirect">user</result>
+            <result name="error" type="tiles">login</result>
+            <result name="input" type="tiles">login</result>
             <result name="invalid.token">/WEB-INF/views/invalidToken.jsp</result>
         </action>
         <action name="logout" class="org.example.action.LogoutAction" method="execute">
-            <result name="success">/WEB-INF/views/login.jsp</result>
+            <result name="success" type="tiles">login</result>
         </action>
 
         <!--   User     -->
         <action name="user" class="org.example.action.UserAction">
             <interceptor-ref name="authStack"/>
-            <result>/WEB-INF/views/user.jsp</result>
+            <result type="tiles">user</result>
         </action>
         <action name="getAllUser" class="org.example.action.UserAction" method="list">
             <interceptor-ref name="authStack"/>
@@ -90,11 +99,17 @@
                 <param name="root">messageResponse</param>
             </result>
         </action>
+        <action name="deleteUsersBulk" class="org.example.action.UserAction" method="deleteUsersBulk">
+            <interceptor-ref name="authStack"/>
+            <result name="success" type="json">
+                <param name="root">messageResponse</param>
+            </result>
+        </action>
 
         <!--  Customer  -->
         <action name="customer" class="org.example.action.CustomerAction">
             <interceptor-ref name="authStack"/>
-            <result>/WEB-INF/views/customer.jsp</result>
+            <result type="tiles">customer</result>
         </action>
         <action name="getFilteredCustomer" class="org.example.action.CustomerAction" method="getFilteredCustomer">
             <interceptor-ref name="authStack"/>
@@ -140,7 +155,7 @@
         <!--  product  -->
         <action name="product" class="org.example.action.ProductAction">
             <interceptor-ref name="authStack"/>
-            <result>/WEB-INF/views/product.jsp</result>
+            <result type="tiles">product</result>
         </action>
         <action name="getListProductFilter" class="org.example.action.ProductAction" method="getListProductFilter">
             <interceptor-ref name="authStack"/>
@@ -166,7 +181,7 @@
         <!--  product detail  -->
         <action name="productDetail" class="org.example.action.ProductDetailAction">
             <interceptor-ref name="authStack"/>
-            <result name="success">/WEB-INF/views/productDetail.jsp</result>
+            <result name="success" type="tiles">productDetail</result>
         </action>
         <action name="addProduct" class="org.example.action.ProductAction" method="addProduct">
             <interceptor-ref name="fileUpload">
@@ -180,6 +195,7 @@
         </action>
 
         <action name="getProductById" class="org.example.action.ProductAction" method="getProductById">
+            <interceptor-ref name="authStack"/>
             <result name="success" type="json">
                 <param name="root">productBaseResponse</param>
             </result>

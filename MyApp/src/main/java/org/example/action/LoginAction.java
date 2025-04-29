@@ -41,7 +41,7 @@ public class LoginAction extends ActionSupport {
 
         if (email == null || password ==null){
             messageResponse.setSuccess(false);
-            messageResponse.setMessage("Đăng nhập thành công");
+            messageResponse.setMessage("Đăng nhập không thành công");
             return INPUT;
         }
 
@@ -54,7 +54,7 @@ public class LoginAction extends ActionSupport {
             userService.updateLastLogin(user.getId());
 
             userService.updateLastIp(user.getId(), getClientIp(request));
-
+            System.out.println("TOKEN"+token);
             Cookie cookie = new Cookie("token",token);
             cookie.setMaxAge(7 * 24 * 60 * 60);
             HttpServletResponse response = ServletActionContext.getResponse();
@@ -70,6 +70,7 @@ public class LoginAction extends ActionSupport {
         }else {
             messageResponse.setSuccess(false);
             messageResponse.setMessage("Đăng nhập thất bại");
+            addActionError("Tài khoản hoặc mật khẩu không đúng!");
             return ERROR;
         }
     }

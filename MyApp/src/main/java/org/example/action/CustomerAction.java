@@ -7,6 +7,7 @@ import org.example.dto.MessageResponse;
 import org.example.dto.PaginationResponse;
 import org.example.model.Customer;
 import org.example.service.CustomerService;
+import org.example.util.Validate;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -54,13 +55,38 @@ public class CustomerAction extends ActionSupport {
 
     public String getFilteredCustomer(){
         paginationResponse = new PaginationResponse<>();
+
+        String nameError = Validate.validateInput(name);
+        if (nameError != null){
+            paginationResponse.setSuccess(false);
+            paginationResponse.setMessage(nameError);
+            paginationResponse.setData(null);
+            paginationResponse.setPaginationInfo(null);
+        }
+
+        String addressError = Validate.validateInput(address);
+        if (addressError != null){
+            paginationResponse.setSuccess(false);
+            paginationResponse.setMessage(addressError);
+            paginationResponse.setData(null);
+            paginationResponse.setPaginationInfo(null);
+        }
+
+        String emailError = Validate.validateInput(email);
+        if (emailError != null){
+            paginationResponse.setSuccess(false);
+            paginationResponse.setMessage(emailError);
+            paginationResponse.setData(null);
+            paginationResponse.setPaginationInfo(null);
+        }
+
         customers = customerService.getCustomerWithPagination(name,email,status,address,page,pageSize);
         totalCustomers = customerService.countFilteredCustomer(name,email,status,address);
         totalPages = (int) Math.ceil((double) totalCustomers / pageSize);
         paginationInfo = new HashMap<>();
         paginationInfo.put("currentPage", page);
         paginationInfo.put("pageSize", pageSize);
-        paginationInfo.put("totalUsers", totalCustomers);
+        paginationInfo.put("totalCustomers", totalCustomers);
         paginationInfo.put("totalPages", totalPages);
 
 
@@ -82,12 +108,12 @@ public class CustomerAction extends ActionSupport {
     public String checkCustomerExist(){
         messageResponse = new MessageResponse();
         Customer customer = customerService.getCustomerByEmail(customer_id, email);
-        if (customer != null) {
-            messageResponse.setSuccess(true);
+        if (customer == null) {
+            messageResponse.setSuccess(false);
             messageResponse.setMessage("Khách hàng chưa tồn tại");
         }
         else{
-            messageResponse.setSuccess(false);
+            messageResponse.setSuccess(true);
             messageResponse.setMessage("Khách hàng đã tồn tại");
         }
         return SUCCESS;
@@ -108,6 +134,7 @@ public class CustomerAction extends ActionSupport {
     }
 
     public String updateCustomer(){
+        messageResponse = new MessageResponse();
         int rowUpdate = customerService.updateUser(customer_id,name, email, tel_num, address);
         if (rowUpdate > 0) {
             messageResponse.setSuccess(true);

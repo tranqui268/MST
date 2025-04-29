@@ -21,9 +21,13 @@ public interface UserMapper {
 
     User getUserByEmail(@Param("id") int id, @Param("email") String email);
 
+    User findUserByEmail(@Param("email") String email);
+
     int addUser(@Param("name") String name, @Param("email") String email,@Param("password") String password, @Param("groupRole") String groupRole);
 
     int deleteUser(@Param("id")int id);
 
     int updateUser(@Param("id")int id, @Param("name") String name, @Param("email") String email, @Param("password") String password,@Param("groupRole") String groupRole );
+
+    int deleteUsersBulk(@Param("ids") List<Integer> ids);
 }

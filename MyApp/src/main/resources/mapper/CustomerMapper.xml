@@ -54,4 +54,8 @@
         SET customer_name = #{name}, email = #{email}, tel_num = #{tel_num}, address = #{address}, updated_at = NOW()
         WHERE customer_id = #{customer_id}
     </insert>
+    <select id="findByEmail" resultType="org.example.model.Customer">
+        SELECT * FROM mst_customer
+        WHERE email = #{email}
+    </select>
 </mapper>
